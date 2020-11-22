@@ -45,7 +45,7 @@ needed modules:
 
 Provide code examples and explanations of how to get the project, e.g.,
 
-	git clone https://github.com/inonoob/CoxswainToFit
+	git clone https://github.com/inonoob/Coxswain2Fit
 	
 ## Usage
 
