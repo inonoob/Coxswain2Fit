@@ -60,8 +60,67 @@ and add it to garmin connect. (Garmin connect only computes Vo2max for running a
 
 ## For developers
 
-this section is mostly for myself as it took a lot of time to dig into the FIT protocol which has a such a good documentation
-    
+This section is mostly for myself as it took a lot of time to dig into the FIT protocol. I wanted to share my knowledge 
+For more details check the Garmin sdk webpage [Official garmin/ant+ SDK](https://developer.garmin.com/fit/overview/). 
+In this section I try to put some more examples to give a better understanding. 
+
+### Fit file structure 
+
+A fit has the following structure: 
+
+    +-----------------------------------+
+    |                                   |
+    |           HEADER                  |
+    |           14 Bytes                |
+    |                                   |
+    +-----------------------------------+
+    +-----------------------------------+
+    |                                   |
+    |         DATA Records              |
+    |                                   |
+    |       Definition Messages         |
+    |       Data Messages               |
+    |                                   |
+    +-----------------------------------+
+    +-----------------------------------+
+    |                                   |
+    |        CRC  2 Bytes               |
+    |                                   |
+    +-----------------------------------+
+
+It has a Header with a size of 14 Bytes, a DATA records part where are the details are store like user profile, heart
+rate zone, the records (in the TCX file used to be called trackpoints), laps, sessions and so on. The last part is the 
+2 bytes CRC number. This is used to check the file integrity. 
+
+### FIT Header  
+
+This table shows the header structure. The used architectur is little endian which means
+bytes are read from right to left. For more details check SDK doc Table 1. Byte Description of File Header
+
+
+
+| Bytes         | Parameter             | Size (bytes)      |   Example or value to expect  | Description |
+| ------------- |:-------------        | :-----:            |: ------:                      |:------|
+| 0             | Header Size           | 1                 | 0x0e                          | length of the header 14 bytes, 12 bytes is legacy 
+| 1             | Protocol Version      | 1                 | 0x20                          | FIT version Protocol 2.0 = 0x20 or 1.0 = 0x10 
+| 2             | Profile Version LSB   | 2                 | 0x5c                          | If you download the SDK you will see this e.g FitSDKRelease_21.40.00.zip the version here is 21.40 = 0x5c 0x08
+| 3             | Profile Version MSB   |                   | 0x08                          |
+| 4             | Data Size LSB         | 4                 | 0x60                          | a 10km rowing session with some user details is 102752 bytes long = 0x00 0x01 0x91 0x60
+| 5             | Data Size             |                   | 0x91                          |
+| 6             | Data Size             |                   | 0x01                          |
+| 7             | Data Size MSB         |                   | 0x00                          |
+| 8             | ASCII value "."       | 4                 | 0x54                          | this is the ascii value combination for the word .FIT 
+| 9             | ASCII value "F"       |                   | 0x49                          |
+| 10            | ASCII value "I"       |                   | 0x46                          |
+| 11            | ASCII value "T"       |                   | 0x2e                          |
+| 12            | CRC LSB               | 2                 | 0x00                          |   CRC value for the header which is as of today set to 0 according to garmin sdk specs
+| 13            | CRC MSN               |                   | 0x00                          |
+
+This is the example of the 10 km rowing session viewed with hexdump : 
+
+    00000000  0e 20 5c 08 60 91 01 00  2e 46 49 54 00 00 40 00  |. \.`....FIT..@.|
+
+
 ## Reference
 
 - [Official garmin/ant+ SDK](https://developer.garmin.com/fit/overview/)
