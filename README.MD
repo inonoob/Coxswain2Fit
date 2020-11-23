@@ -178,24 +178,27 @@ Let's check the hexdump of a FIT file as an example:
 ### The FIT data: 
 
 Let's remember, we know how to create the FIT header and also know how to calculate the CRC checksum of the FIT file but 
-the most important stuff is coming now. How are the data encoded for the information like speed, cadence, heart rate and so on. 
+the most important stuff is coming now. How are the data encoded for the information what type of FIT file is it going to be and things like speed, cadence, heart rate and so on. 
 
-At first a FIT file are used for a lot of things and their for must be defined at first.  
+At first a FIT file are used for a lot of things and their for must be defined at first. What will be the purpose of this FIT file. 
 If you remember in the Garmin SDK, check the Profile.xlsx. There we will find all the possible file types.
 
-here are some example
+here are some example:
 
-| FIT type| details| 
-|:--------|:-------|
-|activity| a recorded sport activity which we are going to mainly use 
-|workout | e.g Yoga steps to perform. this can be defined as fit file and sent to a garmin watch
-|course | if you wanna run in the stadium and you wanna define a course to perform you can create a fit file for that
-|weight | the garmin scale uses that format 
+| FIT type| enum |details| 
+|:--------|:-------|:-------|
+|activity| 4| a recorded sport activity which we are going to mainly use 
+|workout | 5 |e.g Yoga steps to perform or do 100 push-ups. This can be defined as fit file and sent to a garmin watch
+|course | 6 |if you wanna run in the stadium and you wanna define a course to perform you can create a fit file for that
+|weight | 9 |the garmin scale uses that format 
 
-
+So for our project we choose that our FIT fill is an **activity (4)** ! Here are some details on the sdk webpage: [link](https://developer.garmin.com/fit/file-types/activity/)
 
 
 A FIT file is defined by  "FIT messages" and their corresponding "FIT fields"
+
+From here on we are going to focus on how to create a FIT activity file. If you are interested in the other FIT types
+check the example in the SDK example folder and also the SDK webpage[link](https://developer.garmin.com/fit/file-types/)
 
 Let's quick check what kind of FiT messages are available. If you remember in the Garmin SDK, check the Profile.xlsx. 
 
