@@ -64,6 +64,29 @@ This section is mostly for myself as it took a lot of time to dig into the FIT p
 For more details check the Garmin sdk webpage [Official garmin/ant+ SDK](https://developer.garmin.com/fit/overview/). 
 In this section I try to put some more examples to give a better understanding. 
 
+### inside the SDK zip
+
+In the last version 21.40 of the sdk you will find this:  
+
+|  files                | Description | 
+|:-------               |:-------| 
+| Profile.xlsx          | the Profile file is one of the most important one because, it tells us what information a FIT file can have. I will detail later what this means.
+| config.csv            | The config file is a example of which "messages are used for the FIT file example. I also give more details later.     
+| FIT_ReleaseNotes.txt  | Standard release note nothing fancy 
+| FitGen.exe            | FIT file generator sdk for windows                                                                      
+| Java                  | Java Source code for the FIT format and home of one of the most important java program. "FitCSVTool.jar". With this tool it is possible to convert Fit files to CSV.
+| c                     | C source code for FIT format. The fit_example.h is a realy good source for the message numbers but also their byte size 
+| cpp                   | CPP source code for FIt fomrat. 
+| examples              | example of FIT file and CSV file of FIT export. e.g activity, or a scale or course.
+
+Check it out yourself to get all the needed info you need. 
+
+But one big thing with this SDK, there are a lot and I mean a lot of information missing in this SDK version. They are completely 
+missing the helpful pdf [FIT protocol details PDFs](https://github.com/izmailoff/fit-sdk/tree/master/documentation) with more details and also
+a lot of the messages are not mention in the SDK but still exist for the FIT files. Check here to see the complete list : 
+- [FIT Profiles](https://github.com/scrapper/fit4ruby/blob/master/lib/fit4ruby/GlobalFitDictionaries.rb)
+- [FIT Messages](https://github.com/scrapper/fit4ruby/blob/master/lib/fit4ruby/GlobalFitMessages.rb)
+
 ### Fit file structure 
 
 A fit has the following structure: 
@@ -151,6 +174,7 @@ Let's check the hexdump of a FIT file as an example:
     00019160  01 02 84 00 f9 f3 f2 39  04 e5 02 00 01 00 22 60  |.......9......"`| 
  
  So the CRC for this FIT file is 0x22 0x60. This CRC is used to check if the file integrity is fine before doing anything else. e.g Garmin connect or the Fit2CSV converter in the garmin SDK
+
 
 
 
