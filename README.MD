@@ -175,6 +175,45 @@ Let's check the hexdump of a FIT file as an example:
  
  So the CRC for this FIT file is 0x22 0x60. This CRC is used to check if the file integrity is fine before doing anything else. e.g Garmin connect or the Fit2CSV converter in the garmin SDK
 
+### The FIT data: 
+
+Let's remember, we know how to create the FIT header and also know how to calculate the CRC checksum of the FIT file but 
+the most important stuff is coming now. How are the data encoded for the information like speed, cadence, heart rate and so on. 
+
+At first a FIT file are used for a lot of things and their for must be defined at first.  
+If you remember in the Garmin SDK, check the Profile.xlsx. There we will find all the possible file types.
+
+here are some example
+
+| FIT type| details| 
+|:--------|:-------|
+|activity| a recorded sport activity which we are going to mainly use 
+|workout | e.g Yoga steps to perform. this can be defined as fit file and sent to a garmin watch
+|course | if you wanna run in the stadium and you wanna define a course to perform you can create a fit file for that
+|weight | the garmin scale uses that format 
+
+
+
+
+A FIT file is defined by  "FIT messages" and their corresponding "FIT fields"
+
+Let's quick check what kind of FiT messages are available. If you remember in the Garmin SDK, check the Profile.xlsx. 
+
+
+    +---------------------------+-------------------------------------------------------------------------+
+    |                           |                                                                         |
+    |     Header                |                                                                         |
+    |     Definition Message    |       Defintion of the different fields (e.g Speed, Heart_rate)         |
+    |                           |                                                                         |
+    +---------------------------+-------------------------------------------------------------------------+
+    
+    
+    +---------------------------+-------------------------------------------------------------------------+
+    |                           |                                                                         |
+    |    Header                 |                                                                         |
+    |    Data Message           |       Value of the fields e.g( 3,45 m/s, 145 bpm)                       |
+    |                           |                                                                         |
+    +---------------------------+-------------------------------------------------------------------------+
 
 
 
