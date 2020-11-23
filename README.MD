@@ -119,6 +119,39 @@ bytes are read from right to left. For more details check SDK doc Table 1. Byte 
 This is the example of the 10 km rowing session viewed with hexdump : 
 
     00000000  0e 20 5c 08 60 91 01 00  2e 46 49 54 00 00 40 00  |. \.`....FIT..@.|
+    
+Let's then real quick talk about the file CRC checksum creation before diving into the big data portion of the FIT format. 
+
+### CRC checksum 
+
+The crc checksum is calculated with the following function. But before you can compute the crc checksum , you must
+calculate the filesize without the 14 byte header. Then put the result into the header bytes 4 to 7. And then calc the crc 
+with the complete file. This includes the HEADER with updated file size !!!  
+
+        crc_table = [0x0, 0xCC01, 0xD801, 0x1400, 0xF001, 0x3C00, 0x2800, 0xE401,
+            0xA001, 0x6C00, 0x7800, 0xB401, 0x5000, 0x9C01, 0x8801, 0x4400]
+    crc = 0
+    count = 0
+    for byte in bytes:
+
+        count += 1
+        tmp = crc_table[crc & 0xF]
+        crc = (crc >> 4) & 0x0FFF
+        crc = crc ^ tmp ^ crc_table[byte & 0xF]
+
+        tmp = crc_table[crc & 0xF]
+        crc = (crc >> 4) & 0x0FFF
+        crc = crc ^ tmp ^ crc_table[(byte >> 4) & 0xF]
+
+
+Once you have the CRC value you add this to the end of the FIT file. 
+
+Let's check the hexdump of a FIT file as an example:
+
+    00019160  01 02 84 00 f9 f3 f2 39  04 e5 02 00 01 00 22 60  |.......9......"`| 
+ 
+ So the CRC for this FIT file is 0x22 0x60. This CRC is used to check if the file integrity is fine before doing anything else. e.g Garmin connect or the Fit2CSV converter in the garmin SDK
+
 
 
 ## Reference
