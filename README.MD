@@ -267,14 +267,14 @@ This is a header for a Data message:
              |
              +----+Data Message
 
-SO the header value for a data message with all set to default is **0x00**
+S the header value for a data message with all set to default is **0x00**
 
 We have see before the defintion message starting with a 0x40 header, let's now see if we can find in the hexdump of 
 the 10km rowing FIT file the corresponding data message: 
 
     00000020  04 04 86 00 04 76 00 01  00 0e e5 26 ec 32 24 9e  |.....v.....&.2$.|
     
-It is the at position 4 with the 0x00 followed by the 0x04. I know that because that 0x04 is the value of Activity definiton. 
+It is at position 4 with the 0x00 followed by the 0x04. I know that because that 0x04 is the value of Activity definiton. 
 If you remember earlier, activity has the number 4. So there it is :).  Nice you start to be able to read a FIT file by 
 looking at the hexdump :). But we still have a long way ahead. 
 
@@ -289,7 +289,6 @@ Let's now check out what FIT messages are available and how to build a FIT activ
 
 #### FIT messages in detail:    
  
-
 An example is for our Activity FIT file. It is a simple on with only 1 kind of sport in our case rowing, 2 laps and only 
 one start event and one stop event. This is the least amount of information needed to build a FIT activity file. 
 This file is build as following: (I will explain later the detail of each message)
@@ -307,6 +306,118 @@ This file is build as following: (I will explain later the detail of each messag
 - Activity
 
 So each of those "message" needs to be defined and then is followed by the "data message", the values.  
+
+#### FIT Defintion message detail: 
+
+The defintion message is setup as following: 
+                                                                                                       
+                                                                                                          number of fields x Field Definition
+                                                                                                          +---------------------------------+
+    +-----------------------+-------------+--------------------+------------------------+-----------------+---------------------------------+
+    |                       |             |                    |                        |                 |                                 |
+    |                       |             | Architecture       |                        |                 |                                 |
+    |   HEADER              |  RESERVED   | little endian 0x00 |  Global Message Number | # numbers of    |   Field Definition              |
+    |   Definition Message  |  1 byte     | big    endian 0x01 |  2 bytes               | fields (amount) |   3 bytes per definiton         |
+    |   most time 0x40      |  always 0x00| 1 byte             |                        | 1 byte          |                                 |
+    |   1 byte              |             |                    |                        |                 |                                 |
+    +-----------------------+-------------+--------------------+------------------------+-----------------+---------------------------------+
+
+The header byte is for our example and usecase: 
+
+- the header has the value **0x40**
+- reserved is always **0** 
+- we always use little endian **0x00** 
+- Global Message number, number of field and Field defintion depends are variable. 
+
+so let's go back to our example 10km rowing FIT file and let us check the first defintion message. Which is File ID. 
+
+So how to build the defintion message for File ID: 
+
+- We first needed to know what Global Message number is assigned to "File ID". For this, we can check the Profile.xlsx 
+in the garmin SDK download or we check this great github list from the project ruby4fit. [FIT Messages](https://github.com/scrapper/fit4ruby/blob/master/lib/fit4ruby/GlobalFitMessages.rb)
+
+If we check the first entry of the source code we see: 
+
+    message 0, 'file_id' 
+    
+Let's see how it's look like on the Profile.xlsx. Extract from it: 
+
+
+| mesg_num         | uint16            | mesg_name      |   num  | 
+| :---             | :---              | :---           | :--- |
+| |                                    |file_id         | 0|
+| |                                    |capabilities    | 1|
+| |                                    |device_settings | 2|
+| |                                    |user_profile    | 3|
+| |                                    |hrm_profile     | 4|
+| |                                    |zones_target    | 7|
+| |                                    |hr_zone         | 8|
+| |                                    |power_zone      | 9|
+
+file_id has the number 1. The Global Message Number is **0x01**
+
+Now let's check how many fields we can define for file_id. 
+
+Let's check again the ruby4fit source code [FIT Messages](https://github.com/scrapper/fit4ruby/blob/master/lib/fit4ruby/GlobalFitMessages.rb) 
+
+     message 0, 'file_id'
+    field 0, 'enum', 'type', :dict => 'file'
+    field 1, 'uint16', 'manufacturer', :dict => 'manufacturer'
+    alt_field 2, 'manufacturer' do
+      field :default, 'uint16', 'product'
+      field 'garmin', 'uint16', 'garmin_product', :dict => 'garmin_product'
+    end
+    field 3, 'uint32z', 'serial_number'
+    field 4, 'uint32', 'time_created', :type => 'date_time'
+    field 5, 'uint16', 'number'
+    field 6, 'uint16', 'undocumented_field_6'
+    field 7, 'uint32', 'undocumented_field_7'
+
+We see here, that the field_id has 7 possbile field which can be declared. But you may now see what I mentioned early 
+there are fields which has no documention and missing in the sdk doc. 
+
+Let's see what we can find in the garmin sdk. For this we have to check the config.csv of the skd package. 
+
+| Message Name        | Field Name           
+| :---             | :---              
+| | Type                                   |
+| | manufacturer                                   |
+| | product                                   |
+| | serial_number                                   |
+| | time_created                                   |
+| | number                                   |
+| | product_name                                   |
+
+As you see here the sdk is also missing the Base Types of the fields. I will show later that means. But on short, it 
+defines how many bytes are used for which value. e.g manufacturer id is uint16. 
+
+
+                   Base Type enum 0  +------------------+      +--------------------+ File_ID manufaturer num 1
+                                                        |      |
+                     size in bytes 1 +-----------+      |      |      +-------------+ size in bytes 2
+                                                 |      |      |      |
+                  File_ID type num 0 +----+      |      |      |      |      +------+ uint16 0x84 = 132
+                                          |      |      |      |      |      |
+                                          v      v      v      v      v      v
+    +------+------+------+------+------+--+---+--+---+--+---+--v---+--+---+--+---+----------+
+    |      |      |      |      |      |      |      |      |      |      |      |
+    | 0x04 | 0x00 | 0x00 | 0x00 | 0x05 | 0x00 | 0x01 | 0x00 | 0x01 | 0x02 | 0x84 |  . . . . .
+    |      |      |      |      |      |      |      |      |      |      |      |
+    +------+------+------+------+------------------------------------------------+----------+
+                                       +--------------------+ +-----------------+
+                                        FIELD                 FIELD
+                                        TYPE                  MANUFATURER
+
+
+
+
+
+
+
+
+
+
+
 
 ## Reference
 
