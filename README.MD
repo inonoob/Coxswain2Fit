@@ -373,7 +373,7 @@ Let's check again the ruby4fit source code [FIT Messages](https://github.com/scr
     field 6, 'uint16', 'undocumented_field_6'
     field 7, 'uint32', 'undocumented_field_7'
 
-We see here, that the field_id has 7 possbile field which can be declared. But you may now see what I mentioned early 
+We see here, that the field_id has 7 possible field which can be declared. But you may now see what I mentioned early 
 there are fields which has no documention and missing in the sdk doc. 
 
 Let's see what we can find in the garmin sdk. For this we have to check the config.csv of the skd package. 
@@ -391,6 +391,8 @@ Let's see what we can find in the garmin sdk. For this we have to check the conf
 As you see here the sdk is also missing the Base Types of the fields. I will show later that means. But on short, it 
 defines how many bytes are used for which value. e.g manufacturer id is uint16. 
 
+Let's build our first defintion message which is always File_id. we check what fields are available. 
+
 
                    Base Type enum 0  +------------------+      +--------------------+ File_ID manufaturer num 1
                                                         |      |
@@ -401,22 +403,79 @@ defines how many bytes are used for which value. e.g manufacturer id is uint16.
                                           v      v      v      v      v      v
     +------+------+------+------+------+--+---+--+---+--+---+--v---+--+---+--+---+----------+
     |      |      |      |      |      |      |      |      |      |      |      |
-    | 0x04 | 0x00 | 0x00 | 0x00 | 0x05 | 0x00 | 0x01 | 0x00 | 0x01 | 0x02 | 0x84 |  . . . . .
+    | 0x40 | 0x00 | 0x00 | 0x00 | 0x05 | 0x00 | 0x01 | 0x00 | 0x01 | 0x02 | 0x84 |  . . . . .
     |      |      |      |      |      |      |      |      |      |      |      |
     +------+------+------+------+------------------------------------------------+----------+
                                        +--------------------+ +-----------------+
                                         FIELD                 FIELD
                                         TYPE                  MANUFATURER
 
+let's skip to the first field which is type. all before we just defined and saw what it meant. Header, Archi, and so on. 
+
+If we check again the source code of ruby4FIT: 
+
+    field 0, 'enum', 'type'
+    
+the first field defined for file_id is "type", it has the field number 0 and has the base typ "enum". this is shown by
+the 0x00 for the field number then comes the size which is 0x01 byte and finally the base data number 0 which stands for "enum"
+Let's see the second field defined in the file_id. It is manufaturer with the number 1 and base type "uint16"
+Quick check in the ruby4FIT source code: 
+
+    field 1, 'uint16', 'manufacturer' 
+    
+this is shown in the defintion message as 0x01 for the field number 1, then the size which is 2 bytes 0x02 and finaly the base type 
+which is 0x84 in hex and 132 in dec. This is how garmin shows it in there doc on their webpage fig 14 [link](https://developer.garmin.com/fit/protocol/)
+
+You may ask how do we know which base type has which number. It's easy check the sdk webpage table 7 [link](https://developer.garmin.com/fit/protocol/)
+
+But here is also a copy: 
+
+| Base Type #          | Base Type Field   | Type Name     |   Invalid Value  |    Size (Bytes)  |
+| :---                  | :---              | :---          | :---             |    :--- |	
+|0 	 	            |0x00 	            |enum 	        |0xFF 	            |1 	
+|1 	 	            |0x01 	            |sint8 	        |0x7F 	            |1 	
+|2 	 	            |0x02 	            |uint8 	        |0xFF 	            |1 	
+|3 	 	            |0x83 	            |sint16 	    |0x7FFF 	        |2 	
+|4 	 	            |0x84 	            |uint16 	    |0xFFFF 	        |2 	
+|5	 	                |0x85 	            |sint32 	    |0x7FFFFFFF 	    |4 	
+|6 	 	            |0x86 	            |uint32 	    |0xFFFFFFFF 	    |4 	
+|7 	 	            |0x07 	            |string 	    |0x00 	            |1 	
+|8 	 	            |0x88 	            |float32 	    |0xFFFFFFFF 	    |4 	
+|9 	 	            |0x89 	            |float64 	    |0xFFFFFFFFFFFFFFFF |8| 	
+|10 	 	            |0x0A 	            |uint8z 	    |0x00               |1 	
+|11 	 	            |0x8B 	            |uint16z 	    |0x0000 	|2 	
+|12 	 	            |0x8C 	            |uint32z 	    |0x00000000 	|4 	
+|13 	 	            |0x0D 	            |byte 	        |0xFF 	|1 
+|14 	 	            |0x8E 	            |sint64 	    |0x7FFFFFFFFFFFFFFF 	|8 
+|15 	 	            |0x8F 	            |uint64 	    |0xFFFFFFFFFFFFFFFF 	|8 	
+|16 	 	            |0x90 	            |uint64z 	    |0x0000000000000000 	|8 
 
 
 
+Let's see how this looks like in our 10km rowing FIT file in hexdump : 
 
+    00000000  0e 20 5c 08 48 e2 01 00  2e 46 49 54 00 00 start herer ==> 40 00  |. \.H....FIT..@.|
+    00000010  00 00 00 05 00 01 00 01  02 84 02 02 84 03 04 8c  |................|
+    00000020  04 04 86 <== stops here 00 04 76 00 01  00 0e e5 26 ec 32 24 9e  |.....v.....&.2$.|
 
+Let's decode the file_id definition message from this FIT file : 
 
+- 0x40 is the header 
+- 0x00 is reserved byte
+- 0x00 is little endian 
+- 0x00 is file_id which has the number 0 as seen in the profile.xslx in the garmin sdk or ruby4FIT source code 
+- 0x05 means 5 fields are defined 
+- 0x00 is field number 0 which is "type"
+- 0x01 is 1 byte size 
+- 0x00 is the base type "enum" see base type filed 
+- 0x01 is field number 1 which is "manufacturer"
+- 0x02 is 2 byte size
+- 0x84 is data base "uint16" 
+...etc... 
 
+Nice, we now know how to define defintion message. next we will see how to create the data message. 
 
-
+#### FIT Data message detail: 
 
 
 ## Reference
