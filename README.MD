@@ -117,13 +117,12 @@ rate zone, the records (in the TCX file used to be called trackpoints), laps, se
 
 ### FIT Header  
 
-This table shows the header structure. The used architectur is little endian which means
+This table shows the header structure. The used architecture is little endian which means
 bytes are read from right to left. For more details check SDK doc Table 1. Byte Description of File Header
 
 
-
 | Bytes         | Parameter             | Size (bytes)      |   Example or value to expect  | Description |
-| ------------- |:-------------        | :-----:            |: ------:                      |:------|
+| :--- | :---| :--- | :--- | :--- |
 | 0             | Header Size           | 1                 | 0x0e                          | length of the header 14 bytes, 12 bytes is legacy 
 | 1             | Protocol Version      | 1                 | 0x20                          | FIT version Protocol 2.0 = 0x20 or 1.0 = 0x10 
 | 2             | Profile Version LSB   | 2                 | 0x5c                          | If you download the SDK you will see this e.g FitSDKRelease_21.40.00.zip the version here is 21.40 = 0x5c 0x08
