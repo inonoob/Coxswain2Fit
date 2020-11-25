@@ -487,6 +487,9 @@ Nice, we now know how to define definition message. next we will see how to crea
 
 #### FIT Data message detail: 
 
+once the definition message has been defined, the data messages follows with their respective values: 
+
+In this case after the file_id definition message, we have the following data message:
 
 
 
@@ -517,6 +520,62 @@ Nice, we now know how to define definition message. next we will see how to crea
                  header  type   manufacturer     product      serial number      time_created
                                 118 Waterrower     1                             966665266
     
+
+let's examin the data message in detail: 
+
+- the first byte is the data message header: 0x00 
+- the comes the first field of file_id which is type. here type is **4** because the fit file is an **Activity**
+- the second field of file_id is manufacturer. here it is 0x76 0x00 = 118 = waterrower. How do I know that. Let's check
+the profile.xlsx in the sdk folder.  
+
+| manufacturer         | uint16            | mesg_name      |   num  | 
+| :---             | :---              | :---           | :--- |
+| |                                    |garmin         | 1|
+| |                                    |garmin_fr405_antfs    | 2|
+| |                                    |zephyr | 3|
+|  |                                  |..    |..|
+| |                                    |concept2    | 40|
+| |                                    |waterrower     | 118|
+
+Garmin has defined for every manufacturer a specific number. This is allocate by Garmin. 
+
+- the thrid field of file_id product is 1 because I choose it. This field is defined by the manufacture it self not garmin.
+Let's take the example of waterrower. Waterrower would define the S4 rower as 01, the A1 as 2, the M1 rise as 3 for example. 
+But as I said Waterrower must define this. 
+
+- the fourth field of file_id serial number is a number I choose. It is possible to take the waterrower serial number printed
+on the back of the S4 monitor if wanted. 
+
+- the last field of file_id is time creation. This number is the amount of seconds elapsed since the 31.12.89 00:00:00. This date
+is chosen by garmin. It is like the 01.01.1970 00:00:00 Unix time. This type of time representation is used all other the FIT environment
+
+Oki now let's check this in the 10km FIT file hexdump: 
+
+    00000000  0e 20 5c 08 63 e5 01 00  2e 46 49 54 00 00 Start of Def meg=>40 00        |. \.c....FIT..@.|
+    00000010  01 00 00 05 00 01 00 01  02 84 02 02 84 03 04 8c                          |................|
+    00000020  04 04 86 Start of Data msg=>00 04 76 00 01  00 d3 02 96 49 32 24 9e       |.....v......I2$.|
+    00000030  39 start of next def msg=>40 00 01 15 00 04 fd  04 86 00 01 00 01 01 00   |9@..............| 
+    
+We can see in this hexdump the 
+- FIT file Header
+- the file_id definition message
+- the file_id data message 
+- and the beginning of the next definition message starting with 0x40
+
+So to recap: 
+
+- We know how to create the a FIT file header
+- We know how to compute the CRC checksum of the FIT file 
+- We know that every FIT file is composed of a Definition messages and Data messages
+- We know that a Definition messages and Data messages starts with a 1 byte header 
+- We know how to define a Definition message 
+- We know how to define a Data message 
+
+Next we are going to see a workflow how to create and debug a FIT file: 
+
+#### FIT file workflow creation 
+
+
 
 ## Reference
 
