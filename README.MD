@@ -269,7 +269,7 @@ This is a header for a Data message:
 
 The header value for a data message with be **0x00** = 00000000
 
-We have seen before the defintion message starting with a 0x40 header in the hexdump, let's now see if we can find in the hexdump of 
+We have seen before the definition message starting with a 0x40 header in the hexdump, let's now see if we can find in the hexdump of 
 the 10km rowing FIT file the corresponding data message header: 
 
     00000020  04 04 86 starts here=>00<=ends here 04 76 00 01  00 0e e5 26 ec 32 24 9e  |.....v.....&.2$.|
@@ -329,19 +329,18 @@ The header byte is for our example and usecase:
 - reserved is always **0** 
 - we always use little endian **0x00** 
 - Global Message number, number of field and Field definition depends on the message. 
-
-so let's go back to our example, the 10km rowing FIT file and let us check the first definition message. Which is File ID. 
-
-So how to build the definition message for File ID: 
+ 
+So how to build the definition message for File ID as it always has to be the first message in a FIT file after the Fit 
+file header. 
 
 - We first needed to know what Global Message number is assigned to "File ID". For this, we can check the Profile.xlsx 
-in the garmin SDK download or we check this great github list from the project ruby4fit. [FIT Messages](https://github.com/scrapper/fit4ruby/blob/master/lib/fit4ruby/GlobalFitMessages.rb)
+in the garmin SDK download or we check this great github source code from the project ruby4fit. [FIT Messages](https://github.com/scrapper/fit4ruby/blob/master/lib/fit4ruby/GlobalFitMessages.rb)
 
 If we check the first entry of the source code we see: 
 
     message 0, 'file_id' 
     
-Let's see how it's look like on the Profile.xlsx. Extract from it: 
+Let's see how it's look likes in the Profile.xlsx: 
 
 
 | mesg_num         | uint16            | mesg_name      |   num  | 
@@ -355,7 +354,7 @@ Let's see how it's look like on the Profile.xlsx. Extract from it:
 | |                                    |hr_zone         | 8|
 | |                                    |power_zone      | 9|
 
-file_id has the number 1. The Global Message Number is **0x01**
+file_id has the number 0. The Global Message Number is **0x00**
 
 Now let's check how many fields we can define for file_id. 
 
