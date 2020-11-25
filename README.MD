@@ -66,7 +66,7 @@ In this section I try to put some more examples to give a better understanding.
 
 ### inside the SDK zip
 
-In the last version 21.40 of the sdk you will find this:  
+the latest version, which is as of today 21.40, of the sdk contains the following:
 
 |  files                | Description | 
 |:-------               |:-------| 
@@ -79,17 +79,17 @@ In the last version 21.40 of the sdk you will find this:
 | cpp                   | CPP source code for FIt fomrat. 
 | examples              | example of FIT file and CSV file of FIT export. e.g activity, or a scale or course.
 
-Check it out yourself to get all the needed info you need. 
+Check it out for yourself to get the full picture. 
 
-But one big thing with this SDK, there are a lot and I mean a lot of information missing in this SDK version. They are completely 
+I have one big critic with this SDK, there are a lot and I mean a lot of information missing in this SDK version. They are completely 
 missing the helpful pdf [FIT protocol details PDFs](https://github.com/izmailoff/fit-sdk/tree/master/documentation) with more details and also
-a lot of the messages are not mention in the SDK but still exist for the FIT files. Check here to see the complete list : 
+a lot of "definition messages" are not mention in the SDK but still exist for the FIT files. Check here to see the complete list : 
 - [FIT Profiles](https://github.com/scrapper/fit4ruby/blob/master/lib/fit4ruby/GlobalFitDictionaries.rb)
 - [FIT Messages](https://github.com/scrapper/fit4ruby/blob/master/lib/fit4ruby/GlobalFitMessages.rb)
 
 ### Fit file structure 
 
-A fit has the following structure: 
+A FIT file has the following structure: 
 
     +-----------------------------------+
     |                                   |
@@ -111,14 +111,14 @@ A fit has the following structure:
     |                                   |
     +-----------------------------------+
 
-It has a Header with a size of 14 Bytes, a DATA records part where are the details are store like user profile, heart
+It has a Header with a size of 14 Bytes, a DATA records part where all the details are store like user profile, heart
 rate zone, the records (in the TCX file used to be called trackpoints), laps, sessions and so on. The last part is the 
 2 bytes CRC number. This is used to check the file integrity. 
 
 ### FIT Header  
 
 This table shows the header structure. The used architecture is little endian which means
-bytes are read from right to left. For more details check SDK doc Table 1. Byte Description of File Header
+bytes are read from right to left. For more details check SDK doc Table 1. Byte Description of File Header [link](https://developer.garmin.com/fit/protocol/)
 
 
 | Bytes         | Parameter             | Size (bytes)      |   Example or value to expect  | Description |
@@ -140,15 +140,15 @@ bytes are read from right to left. For more details check SDK doc Table 1. Byte 
 
 This is the example of the 10 km rowing session viewed with hexdump : 
 
-    00000000  0e 20 5c 08 60 91 01 00  2e 46 49 54 00 00 40 00  |. \.`....FIT..@.|
+    00000000  starts here=>0e 20 5c 08 60 91 01 00  2e 46 49 54 00 00<=ends here 40 00  |. \.`....FIT..@.|
     
-Let's then real quick talk about the file CRC checksum creation before diving into the big data portion of the FIT format. 
+Let's real quick talk about the file CRC checksum creation before diving into the big data portion of the FIT format. 
 
 ### CRC checksum 
 
-The crc checksum is calculated with the following function. But before you can compute the crc checksum , you must
-calculate the filesize without the 14 byte header. Then put the result into the header bytes 4 to 7. And then calc the crc 
-with the complete file. This includes the HEADER with updated file size !!!  
+The crc checksum is calculated with the following function. But before you can compute the crc checksum, you must
+calculate the file size without the 14 byte header. Then put the result into the header bytes position 4 to 7. And then calc the crc 
+with the complete file. This includes the HEADER with updated file size !
 
         crc_table = [0x0, 0xCC01, 0xD801, 0x1400, 0xF001, 0x3C00, 0x2800, 0xE401,
             0xA001, 0x6C00, 0x7800, 0xB401, 0x5000, 0x9C01, 0x8801, 0x4400]
@@ -170,16 +170,16 @@ Once you have the CRC value you add this to the end of the FIT file.
 
 Let's check the hexdump of a FIT file as an example:
 
-    00019160  01 02 84 00 f9 f3 f2 39  04 e5 02 00 01 00 22 60  |.......9......"`| 
+    00019160  01 02 84 00 f9 f3 f2 39  04 e5 02 00 01 00 starts here=>22 60<=ends here  |.......9......"`| 
  
- So the CRC for this FIT file is 0x22 0x60. This CRC is used to check if the file integrity is fine before doing anything else. e.g Garmin connect or the Fit2CSV converter in the garmin SDK
+ The CRC for this FIT file is 0x22 0x60. This CRC is used to check if the file integrity is fine before doing anything else. e.g Garmin connect or the Fit2CSV converter in the garmin SDK
 
 ### The FIT data: 
 
 Let's remember, we know how to create the FIT header and also know how to calculate the CRC checksum of the FIT file but 
 the most important stuff is coming now. How are the data encoded for the information what type of FIT file is it going to be and things like speed, cadence, heart rate and so on. 
 
-At first a FIT file are used for a lot of things and their for must be defined at first. What will be the purpose of this FIT file. 
+At first a FIT file are used for a lot of things and therefore must be defined at first. What will be the purpose of this FIT file. 
 If you remember in the Garmin SDK, check the Profile.xlsx. There we will find all the possible file types.
 
 here are some example:
@@ -191,7 +191,7 @@ here are some example:
 |course | 6 |if you wanna run in the stadium and you wanna define a course to perform you can create a fit file for that
 |weight | 9 |the garmin scale uses that format 
 
-So for our project we choose that our FIT fill is an **activity (4)** ! Here are some details on the sdk webpage: [link](https://developer.garmin.com/fit/file-types/activity/)
+So for our project we choose that our FIT file is an **activity (4)** ! Here are some details on the sdk webpage: [link](https://developer.garmin.com/fit/file-types/activity/)
 
 From here on we are going to focus on how to create a FIT activity file. If you are interested in the other FIT types
 check the example in the SDK example folder and also the SDK webpage [link](https://developer.garmin.com/fit/file-types/)
@@ -199,9 +199,9 @@ check the example in the SDK example folder and also the SDK webpage [link](http
 #### FIT messages overview
 
 A FIT file is defined by "FIT messages" and their corresponding "FIT fields" not matter what type of FIT file. It always 
-is definition of a Message and a Data Message.
+is "Definition Message" and  "Data Message".
 
-both of them start with a 1 byte long header which is defined by certain bit combination. We well see later how to build the header. 
+both of them start with a 1 byte long header which is defined by certain bit combination. We well see later how to build the header for those. 
 
     +---------------------------+-------------------------------------------------------------------------+
     |                           |                                                                         |
@@ -223,7 +223,7 @@ both of them start with a 1 byte long header which is defined by certain bit com
 each FIT messages if precede by a 1 byte header. This one byte header is build by the 8 defined bit. For more details check 
 the garmin sdk webpage FIT protocol figure 9 [link](https://developer.garmin.com/fit/protocol/) 
 
-in this part I will only explain with the bits I needed for the python script if you want to understand more deeply 
+in this part I will only explain which bits to set that I needed for the python script. If you want to understand more deeply 
 the other bits please check the garmin SDK documentation. 
 
 This is a header for a Definition Message:  
@@ -242,14 +242,14 @@ This is a header for a Definition Message:
              |
              +----+Definition Message
 
-So the header value for a definiton message would be **0x40** for a Defintion Message. 
+The header value for a definition message would be **0x40** = 010000000.
 
 Let's check a hexdump of the 10km rowing FIT file to see if we can spot the header: 
 
-    00000000  0e 20 5c 08 48 e2 01 00  2e 46 49 54 00 00 40 00  |. \.H....FIT..@.|
+    00000000  0e 20 5c 08 48 e2 01 00  2e 46 49 54 00 00 Starts here=>40<=ends Here 00  |. \.H....FIT..@.|
     
-yep if you have followed all what we have seen before, juste after the FIT header we see the number 40 which is the 
-first header of the first Defintion message. (We will see which Defintion message is always after the FIT header. "File Id")
+If you have followed all along what we have seen before, juste after the FIT file header, we see the number 0x40 which is the 
+first header of the first Definition message. (We will see which Definition message is always after the FIT file header. "File Id")
 
 This is a header for a Data message: 
 
@@ -267,30 +267,31 @@ This is a header for a Data message:
              |
              +----+Data Message
 
-S the header value for a data message with all set to default is **0x00**
+The header value for a data message with be **0x00** = 00000000
 
-We have see before the defintion message starting with a 0x40 header, let's now see if we can find in the hexdump of 
-the 10km rowing FIT file the corresponding data message: 
+We have seen before the defintion message starting with a 0x40 header in the hexdump, let's now see if we can find in the hexdump of 
+the 10km rowing FIT file the corresponding data message header: 
 
-    00000020  04 04 86 00 04 76 00 01  00 0e e5 26 ec 32 24 9e  |.....v.....&.2$.|
+    00000020  04 04 86 starts here=>00<=ends here 04 76 00 01  00 0e e5 26 ec 32 24 9e  |.....v.....&.2$.|
     
-It is at position 4 with the 0x00 followed by the 0x04. I know that because that 0x04 is the value of Activity definiton. 
+It is at position 4 with 0x00 followed by the 0x04. I know that because that 0x04 is an activity the value for field "type" from the message file_id . 
 If you remember earlier, activity has the number 4. So there it is :).  Nice you start to be able to read a FIT file by 
 looking at the hexdump :). But we still have a long way ahead. 
 
 So to recap: 
 
-- We know how to create the a FIT header
+- We know how to create the a FIT file header
 - We know how to compute the CRC checksum of the FIT file 
 - We know that every FIT file is composed of a Definition messages and Data messages
-- We know that a Definition messages and Data messages have headers 
+- We know that a Definition messages and Data messages starts with a 1 byte header
 
 Let's now check out what FIT messages are available and how to build a FIT activity file. 
 
 #### FIT messages in detail:    
  
 An example is for our Activity FIT file. It is a simple on with only 1 kind of sport in our case rowing, 2 laps and only 
-one start event and one stop event. This is the least amount of information needed to build a FIT activity file. 
+one start event and one stop event. This is the least amount of information needed to build a FIT activity file. Check the garmin sdk webpage
+for more details about activity file [link](https://developer.garmin.com/fit/file-types/activity/)
 This file is build as following: (I will explain later the detail of each message)
 
 - File Id
@@ -305,11 +306,11 @@ This file is build as following: (I will explain later the detail of each messag
 - Session
 - Activity
 
-So each of those "message" needs to be defined and then is followed by the "data message", the values.  
+So each of those "message" needs to be defined by a "definition message" and then is followed by the "data message".  
 
-#### FIT Defintion message detail: 
+#### FIT Definition message detail: 
 
-The defintion message is setup as following: 
+The definition message is setup as following: 
                                                                                                        
                                                                                                           number of fields x Field Definition
                                                                                                           +---------------------------------+
@@ -327,11 +328,11 @@ The header byte is for our example and usecase:
 - the header has the value **0x40**
 - reserved is always **0** 
 - we always use little endian **0x00** 
-- Global Message number, number of field and Field defintion depends are variable. 
+- Global Message number, number of field and Field definition depends on the message. 
 
-so let's go back to our example 10km rowing FIT file and let us check the first defintion message. Which is File ID. 
+so let's go back to our example, the 10km rowing FIT file and let us check the first definition message. Which is File ID. 
 
-So how to build the defintion message for File ID: 
+So how to build the definition message for File ID: 
 
 - We first needed to know what Global Message number is assigned to "File ID". For this, we can check the Profile.xlsx 
 in the garmin SDK download or we check this great github list from the project ruby4fit. [FIT Messages](https://github.com/scrapper/fit4ruby/blob/master/lib/fit4ruby/GlobalFitMessages.rb)
