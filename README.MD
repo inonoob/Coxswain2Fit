@@ -259,7 +259,7 @@ This is a header for a Data message:
        v                 v  +-----------------------+
     +--+--+-----+-----+--+---------------------------------------------------------------------+
     |     |     |     |     |     |     |     |     |                                          |
-    |  0  |  0  |  0  |  0  |  0  |  0  |  0  |  0  |     Data Message                    |
+    |  0  |  0  |  0  |  0  |  0  |  0  |  0  |  0  |     Data Message                         |
     |     |     |     |     |     |     |     |     |                                          |
     +-----+--+--+--+--+-----------------------------+------------------------------------------+
              ^     ^        +----------------------+
@@ -410,25 +410,35 @@ Let's build our first definition message which is always file_id. we check what 
                                         FIELD                 FIELD
                                         TYPE                  MANUFATURER
 
-let's skip to the first field which is type. all before we just defined and saw what it meant. Header, Archi, and so on. 
+let's skip the first 5 bytes to the first field which is "type". As we have already seen what the first 5 bytes are meaning.  
 
 If we check again the source code of ruby4FIT: 
 
     field 0, 'enum', 'type'
     
-the first field defined for file_id is "type", it has the field number 0 and has the base typ "enum". this is shown by
-the 0x00 for the field number then comes the size which is 0x01 byte and finally the base data number 0 which stands for "enum"
-Let's see the second field defined in the file_id. It is manufaturer with the number 1 and base type "uint16"
+the first field defined for file_id is:
+- "type"
+- it has the field number 0x00
+- then comes the size which is 0x01 byte 
+- and finally the base data number 0x00 which stands for "enum" 
+
+Let's see the second field defined in the file_id. It is manufaturer .
+
 Quick check in the ruby4FIT source code: 
 
     field 1, 'uint16', 'manufacturer' 
     
-this is shown in the defintion message as 0x01 for the field number 1, then the size which is 2 bytes 0x02 and finaly the base type 
-which is 0x84 in hex and 132 in dec. This is how garmin shows it in there doc on their webpage fig 14 [link](https://developer.garmin.com/fit/protocol/)
+this is shown in the defintion message:
+- "manufacturer" as
+- has the field number 0x01
+- the size which is 0x02 bytes 0x02
+- finaly the base type which is 0x84 in hex and 132 in dec. 
+
+This is how garmin shows it in there doc on their webpage fig 14 [link](https://developer.garmin.com/fit/protocol/)
 
 You may ask how do we know which base type has which number. It's easy check the sdk webpage table 7 [link](https://developer.garmin.com/fit/protocol/)
 
-But here is also a copy: 
+overview of different Base Types: 
 
 | Base Type #          | Base Type Field   | Type Name     |   Invalid Value  |    Size (Bytes)  |
 | :---                  | :---              | :---          | :---             |    :--- |	
@@ -473,7 +483,7 @@ Let's decode the file_id definition message from this FIT file :
 - 0x84 is data base "uint16" 
 ...etc... 
 
-Nice, we now know how to define defintion message. next we will see how to create the data message. 
+Nice, we now know how to define definition message. next we will see how to create the data message. 
 
 #### FIT Data message detail: 
 
