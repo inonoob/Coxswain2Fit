@@ -373,10 +373,10 @@ Let's check again the ruby4fit source code [FIT Messages](https://github.com/scr
     field 6, 'uint16', 'undocumented_field_6'
     field 7, 'uint32', 'undocumented_field_7'
 
-We see here, that the field_id has 7 possible field which can be declared. But you may now see what I mentioned early 
-there are fields which has no documention and missing in the sdk doc. 
+We see here that the field_id has 8 possible field which can be declared. But you may now see what I mentioned early 
+that there are fields which has no documentation and are also missing in the sdk doc. 
 
-Let's see what we can find in the garmin sdk. For this we have to check the config.csv of the skd package. 
+Let's see what we can find in the Garmin sdk. For this we have to check the config.csv of the skd package. 
 
 | Message Name        | Field Name           
 | :---             | :---              
@@ -388,10 +388,10 @@ Let's see what we can find in the garmin sdk. For this we have to check the conf
 | | number                                   |
 | | product_name                                   |
 
-As you see here the sdk is also missing the Base Types of the fields. I will show later that means. But on short, it 
+As you can see here the sdk is also missing the Base Types of the fields. I will show later that means. But on short, it 
 defines how many bytes are used for which value. e.g manufacturer id is uint16. 
 
-Let's build our first defintion message which is always File_id. we check what fields are available. 
+Let's build our first definition message which is always file_id. we check what fields are available. 
 
 
                    Base Type enum 0  +------------------+      +--------------------+ File_ID manufaturer num 1
