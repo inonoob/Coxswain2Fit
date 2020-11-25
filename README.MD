@@ -573,8 +573,64 @@ So to recap:
 
 Next we are going to see a workflow how to create and debug a FIT file: 
 
+#### Special Fields also called Common Fields: 
+
+Timestamp (Field # = 253, timestamp) : Timestamp field for all FIT messages which are the seconds elapsed since 31.12.89 00:00:00 
+
+Message Index (Field # = 254, message_index) : This field allows messages to be indexed with a common method 
+
+check garmin sdk webpage for more information [link](https://developer.garmin.com/fit/protocol/)
+
 #### FIT file workflow creation 
 
+1. I first take a valid FIT activity from the example SDK folderor my garmin watch
+2. I convert this FIT file with the java tool "FitCSVTool.jar" in the garmin SDK to csv file. 
+
+        java -jar FitCSVTool.jar -d result.fit     
+        
+3. I check what kind of information are needed and how the file is build
+    - File Id
+    - Event Timer Start
+    - Userprofil
+    - Hear rate zones
+    - Record (trackpoint)
+    - Record (trackpoint)
+    - Lap
+    - Record (trackpoint)
+    - Record (trackpoint)
+    - Lap
+    - Event Timer Stop
+    - Session
+    - Activity
+
+4. I then check for every Definition message and data messages in the config.csv garmin SDK or ruby4FIT source code. 
+I would like to remind that the ruby4FIT source code has way more information about the definition message and their fields. 
+Another methode is to check in the c folder of the garmin SDK the file FIT_example.h . If look for definition message, they are 
+defined with the field number, the size and also the base type. But also here not all Definition message are available. This 
+can be experienced by creating a FIT file with definition message unknown for the java tool "FitCSVTool.jar". The progrmam will 
+report in the csv file "unknown field". 
+    - the Field number for this definition message
+    - the base type (e.g enum, uint16, ...)
+    - the base size (1byte,2byte, ...)
+
+5. Once I have all the information and the order of those definition, I create the FIT file: 
+
+    - Create 14byte header with empty size bytes
+    - Create Definition Message and Data messages 
+    - Calculate the size of the file without the 14byte header
+    - insert value size into the FIT file Header  
+    - Calculate the CRC checksum of the complete FIT file which has been created 
+    - insert at the end of the file the 2 byte CRC checksum 
+    
+
+#### extend the rowing activity FIT file (Possible future feature)
+
+Garmin offers so much more with their FIT environment that it would make sense to extend the Activity FIT file with more 
+information like training effect or vo2max, lactate threshold heart rate, heart rate zones and so on. 
+In order to do this, much more experience must be gained of what and how is garmin using the FIT files and the KPIs. 
+For example if we could check what output generates a FENIX 6 pro during an activity. 
+Take this activity FIT file with all the information and try to implement the same definition and data messages in order 
+to get the same benefits shown in garmin connect. 
 
 
 ## Reference
