@@ -488,6 +488,36 @@ Nice, we now know how to define definition message. next we will see how to crea
 #### FIT Data message detail: 
 
 
+
+
+                                       Base Type enum 0  +------------------+      +--------------------+ File_ID manufaturer num 1
+                                                                            |      |
+                                         size in bytes 1 +-----------+      |      |      +-------------+ size in bytes 2
+                                                                     |      |      |      |
+                                      File_ID type num 0 +----+      |      |      |      |      +------+ uint16 0x84 = 132
+                                                              |      |      |      |      |      |
+                                                              v      |      |      |      v      v
+                        +------+------+------+------+------+--+---+--+---+--+---+--v---+--+---+--+---+----------+
+                        |      |      |      |      |      |      |      |      |      |      |      |
+    definition message  | 0x04 | 0x00 | 0x00 | 0x00 | 0x05 | 0x00 | 0x01 | 0x00 | 0x01 | 0x02 | 0x84 |  . . . . .
+                        |      |      |      |      |      |      |      |      |      |      |      |
+                        +------+------+------+------+------------------------------------------------+----------+
+                                                           +--------------------+ +-----------------+
+                                                            FIELD     |           FIELD        |
+                                                            TYPE      |           MANUFATURER  |
+                            +-----------------------------------------+                        |
+                            |                                                                  |
+                            |        +---------------------------------------------------------+
+                            v        |
+                +-------+---+--+-----+-------+-------------+-------------------+---------------------+
+                |       |      |             |             |                   |                     |
+    Data message| 0x00  | 0x04 |  0x76 0x00  |  0x10 0x00  |0xd3 0x02 0x96 0x49|0x32 0x24 0x9e 0x39  |
+                |       |      |             |             |                   |                     |
+                +-------+------+-------------+-------------+-------------------+---------------------+
+                 header  type   manufacturer     product      serial number      time_created
+                                118 Waterrower     1                             966665266
+    
+
 ## Reference
 
 - [Official garmin/ant+ SDK](https://developer.garmin.com/fit/overview/)

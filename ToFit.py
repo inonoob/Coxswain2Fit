@@ -48,7 +48,7 @@ is then written after the ".FIT" in the header and is followed by 0x40
 class file_id:
     def __init__(self, attr=None):
         if attr is None:
-            attr = [966665266, 4, 118, 1, 3961971982] # array with the default value if class is initiated
+            attr = [966665266, 4, 118, 1, 1234567891] # array with the default value if class is initiated
         self.id = 0 # ID for file type is 0 check garmin fit SDK
         self.time_created = attr[0]
         self.type = attr[1] # deflaut 4 is activity type
