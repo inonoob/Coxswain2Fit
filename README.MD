@@ -43,13 +43,24 @@ needed modules:
 
 ## Installation or Getting Started
 
-Provide code examples and explanations of how to get the project, e.g.,
-
 	git clone https://github.com/inonoob/Coxswain2Fit
 	
 ## Usage
+In order to use the script, call the scirpt with python3.8 use the --input command and give the path tp the coxswain tcx file
 
-Show how to use the project or library.
+    python3.8 CoxswainToFit.py --input /path/to/coxswainfile.tcx
+    
+    >>> main header created
+    >>> file_id message + data created
+    >>> write data for session
+    >>> write data for activity
+    <<< file is : 124273 bytes
+    >>> file size placed into the header with removed 14 bytes of header from the size file
+    <<< checksum calculated:                                     6bf3
+    >>> checksum placed at the end of the file
+    >>> file exported to rowing-session.fit
+    finished
+    
 
 ## Possible improvements 
 
