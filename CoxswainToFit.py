@@ -3,6 +3,7 @@ import TCXextractor
 import FITpreparator
 import io
 import datetime
+import argparse
 
 
 
@@ -54,7 +55,8 @@ def main(file):
 
 
 if __name__ == '__main__':
-    print("enter pathway of file")
-    file = input()
-    main(file)
+    parser = argparse.ArgumentParser(description="takes the Coxswain TCX file and export it as FIT file")
+    parser.add_argument('-i', '--input', help="give file path to the Coxswain TCX file")
+    args = parser.parse_args()
+    main(args.input)
 

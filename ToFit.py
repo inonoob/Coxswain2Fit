@@ -449,7 +449,7 @@ def record_creator(index,record_array,output_file):
 
     for index2, records in enumerate(record_array[index]):
         record_creation = record(records)
-        print("record {} entry created for lap {}" .format(index2,index))
+        #print("record {} entry created for lap {}" .format(index2,index))
         output_file.write(record_creation.output_byte()[0])
         output_file.write(record_creation.output_byte()[1])
     return output_file
@@ -464,17 +464,17 @@ def laps_creator(laps_array,record_array,output_file):
 
     laps_creation_message = lap()
     #output_file.write(laps_creation_message.output_byte()[0])
-    print(">>> lap message created")
+    #print(">>> lap message created")
     record_cretion_message = record()
     #output_file.write(record_cretion_message.output_byte()[0])
-    print(">>> record message created")
+    #print(">>> record message created")
 
     for index, current_lap in enumerate(laps_array):
         record_creator(index,record_array,output_file)
         laps_creation_data = lap(current_lap)
         output_file.write(laps_creation_message.output_byte()[0])
         output_file.write(laps_creation_data.output_byte()[1])
-        print(">>> lap created, record for lap going to be create")
+        #print(">>> lap created, record for lap going to be create")
     return output_file
 
 
@@ -492,12 +492,12 @@ def check_file_size(f):
     return f
 
 def export_file(f):
-
-    export = open("result.fit","w+b")
+    filename = "rowing-session.fit"
+    export = open(filename,"w+b")
     #output.seek(0)
     export.write(f.getbuffer())
-    print("file exported")
-    print("done")
+    print(">>> file exported to {}".format(filename))
+    print("finished")
 
 def default_test():
 

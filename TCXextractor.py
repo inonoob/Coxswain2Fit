@@ -200,17 +200,7 @@ def main(file):
     events = FITpreparator.event_preperator(record_array)
     activity = FITpreparator.activity_preparator(record_array)
     session = FITpreparator.session_preparator(lap_total_array, record_array, total_strokes)
-
-
-
-
-
-
-
     print("done")
-
-
-
 
 if __name__ == '__main__':
     # need to ask for file, for age, for weight and vo2max needed for calorires
